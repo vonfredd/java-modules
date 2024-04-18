@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Asia implements Continent {
     @Override
-    public List<String> someCountries(String continent) {
+    public List<String> someCountries() {
         return List.of("China", "Mongolia", "Thailand", "Japan", "India", "Indonesia", "Pakistan", "Bangladesh");
     }
 }
