@@ -1,14 +1,10 @@
 package org.example.service;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.*;
+
 
 @Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
 public @interface Hemisphere {
-    enum Direction {
-        NORTHERN,
-        SOUTHERN,
-        EASTERN,
-        WESTERN
-    }
+    Direction[] value();
 }
