@@ -2,19 +2,24 @@ package org.consumer;
 
 import org.example.service.Continent;
 
-import java.util.ArrayList;
-import java.util.Scanner;
-import java.util.ServiceLoader;
+import java.util.*;
 
 public class Main {
     static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
         ServiceLoader<Continent> continents = ServiceLoader.load(Continent.class);
+
+        HashSet<String> m = new HashSet<>();
+
         var listOfContinents = new ArrayList<Continent>();
         continents.forEach(listOfContinents::add);
-        int input = 0;
 
+        int input = 0;
+        applicationLoop(input, listOfContinents);
+    }
+
+    private static void applicationLoop(int input, ArrayList<Continent> listOfContinents) {
         while (input != -1) {
             menu(listOfContinents);
             input = inputFromUser(listOfContinents.size());
@@ -25,6 +30,7 @@ public class Main {
             System.out.printf("""
                     Located in %s:
                     """, m.simpleName());
+
             listOfContinents.get(input).someCountries().forEach(System.out::println);
             System.out.println("Press 'Enter' to go back..");
             scanner.nextLine();
@@ -32,7 +38,7 @@ public class Main {
     }
 
     private static int inputFromUser(int numberOfContinents) {
-        while(true) {
+        while (true) {
             String input = scanner.nextLine();
             try {
                 if (input.equalsIgnoreCase("Q")) {
@@ -48,22 +54,29 @@ public class Main {
         }
     }
 
+    private static void menuBuilder(StringBuilder sb, int i, int size, ArrayList<Continent> listOfContinents) {
+        if (i == size)
+            return;
+        sb.append(i)
+                .append(". ")
+                .append(listOfContinents
+                        .get(i).simpleName())
+                .append("\n");
+        menuBuilder(sb, i + 1, size, listOfContinents);
+    }
+
     private static void menu(ArrayList<Continent> listOfContinents) {
-        System.out.println("""
-                                
+        StringBuilder sb = new StringBuilder();
+        menuBuilder(sb, 0, listOfContinents.size(), listOfContinents);
+        System.out.printf("""
+                ________________________________
                 Pick a number to display
                 some countries on that continent
                 ________________________________
-                """);
+                %s
+                'Q'. Quit
+                ________________________________
+                %n""", sb);
 
-        for (int i = 0; i < listOfContinents.size(); i++) {
-            System.out.println(i + ". " + listOfContinents.get(i).simpleName());
-            if (i == listOfContinents.size() - 1) {
-                System.out.println("""
-                        'Q'. Quit
-                        ________________________________
-                        """);
-            }
-        }
     }
 }
