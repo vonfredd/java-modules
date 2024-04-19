@@ -1,6 +1,8 @@
 package org.consumer;
 
-import org.example.service.Menu;
+import org.example.service.Continent;
+
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.ServiceLoader;
 
@@ -8,47 +10,60 @@ public class Main {
     static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
+        ServiceLoader<Continent> continents = ServiceLoader.load(Continent.class);
+        var listOfContinents = new ArrayList<Continent>();
+        continents.forEach(listOfContinents::add);
+        int input = 0;
 
-        while (true) {
-            ServiceLoader<Menu> loaderMenu = ServiceLoader.load(Menu.class);
-            var menu = loaderMenu.findFirst();
-            menu.ifPresent(value -> System.out.println(value.showMenu()));
-            String input = userInput();
-            if (input.equalsIgnoreCase("q")) {
+        while (input != -1) {
+            menu(listOfContinents);
+            input = inputFromUser(listOfContinents.size());
+            if (input == -1) {
                 break;
             }
-
-            switch (input) {
-                case "1" -> Presentation.show("Asia");
-                case "2" -> Presentation.show("Europe");
-                case "3" -> Presentation.show("NorthAmerica");
-                case "4" -> Presentation.show("SouthAmerica");
-                case "5" -> Presentation.show("Africa");
-                default -> Presentation.show();
-            }
+            var m = listOfContinents.get(input);
+            System.out.printf("""
+                    Located in %s:
+                    """, m.simpleName());
+            listOfContinents.get(input).someCountries().forEach(System.out::println);
+            System.out.println("Press 'Enter' to go back..");
             scanner.nextLine();
         }
     }
 
-    private static String userInput() {
-        while (true) {
+    private static int inputFromUser(int numberOfContinents) {
+        while(true) {
             String input = scanner.nextLine();
             try {
-                if (input.equalsIgnoreCase("q"))
-                    return input;
-                int number = Integer.parseInt(input);
-                return validNumberToString(number);
-            } catch (NumberFormatException e) {
-                System.out.println("Please enter a number 1-5 or 'q'!");
-            } catch (IllegalArgumentException e) {
-                System.out.println("Only single numbers 1-5 or 'q'!");
+                if (input.equalsIgnoreCase("Q")) {
+                    return -1;
+                }
+                int i = Integer.parseInt(input);
+                if (i >= numberOfContinents || i < 0)
+                    throw new ArrayIndexOutOfBoundsException();
+                return i;
+            } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                System.out.println("Invalid input");
             }
         }
     }
-    private static String validNumberToString(int number) {
-        if (number >= 1 && number <= 5) {
-            return String.valueOf(number);
+
+    private static void menu(ArrayList<Continent> listOfContinents) {
+        System.out.println("""
+                                
+                Pick a number to display
+                some countries on that continent
+                ________________________________
+                """);
+
+        for (int i = 0; i < listOfContinents.size(); i++) {
+            System.out.println(i + ". " + listOfContinents.get(i).simpleName());
+            if (i == listOfContinents.size() - 1) {
+                System.out.println("""
+                        'Q'. Quit
+                        ________________________________
+                        """);
+            }
         }
-        throw new IllegalArgumentException();
     }
 }
