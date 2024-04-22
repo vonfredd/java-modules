@@ -5,7 +5,6 @@ import org.example.service.Direction;
 import org.example.service.Hemisphere;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Main {
     static Scanner scanner = new Scanner(System.in);
@@ -33,13 +32,27 @@ public class Main {
                 Direction[] directionsValue = listOfContinent.getClass().getAnnotation(Hemisphere.class).value();
                 for (Direction direction : directionsValue) {
                     if (direction.equals(chosenDirection)) {
-                        System.out.println(String.join(",", listOfContinent.someCountries()));
+                        System.out.println(presentationContinent(listOfContinent));
                     }
                 }
             }
             System.out.println("Press 'Enter' to go back..");
             scanner.nextLine();
         }
+    }
+
+    private static String presentationContinent(Continent listOfContinent) {
+        String continent = Arrays.stream(listOfContinent
+                        .getClass()
+                        .getName()
+                        .split("\\."))
+                .toList()
+                .getLast();
+        String countries = String.join(",", listOfContinent.someCountries());
+        return """
+                Continent: %s
+                %s
+                """.formatted(continent, countries);
     }
 
     private static int inputFromUser(int numberOfContinents) {
@@ -76,7 +89,7 @@ public class Main {
         StringBuilder sb = new StringBuilder();
         int counter = 0;
         for (Direction direction : ListOfDirections) {
-            sb.append(++counter).append(". ").append(direction).append("\n");
+            sb.append(counter++).append(". ").append(direction).append("\n");
         }
         System.out.printf("""
                 ________________________________
